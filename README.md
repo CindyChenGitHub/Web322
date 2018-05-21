@@ -1,2 +1,2 @@
 # WEB322
-My WEB322 Assignments, Seneca Semester2, 2018
+My WEB322 Assignments, Seneca Semester3, Summer 2018
