@@ -110,8 +110,8 @@ app.get("/employees",(req,res)=>{
     }
 })
 // setup a 'route' to get employees by empNum
-app.get("/employee/num",(req,res)=>{
-
+app.get("/employee/:num",(req,res)=>{
+    var num = req.params.num;
     dataservice.getEmployeeByNum(num)
     .then((data)=>{
         res.status(200).json(data);
