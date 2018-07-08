@@ -179,6 +179,17 @@ app.post("/employees/add", (req, res) => {
         console.log("unable to add employee");
     });
 });
+// setup a post 'route' to update employees
+/* app.post("/employee/update", (req, res) => {
+    console.log(req.body);
+    res.redirect("/employees");
+}); */
+app.post("/employee/update", (req, res) => {
+    dataservice.updateEmployee(req.body)
+    .then(res.redirect("/employees"));
+    //res.redirect("/employees");
+});
+
 // setup a post 'route' to add image
 app.post("/images/add", upload.single(("imageFile")), (req, res) => {
     res.redirect("/images");

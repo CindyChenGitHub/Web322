@@ -67,7 +67,7 @@ module.exports.getEmployeesByStatus = function (status){
         }
         else{
             resolve(Employee.filter(function(item, index, array){
-                return item.status = status;
+                return item.status == status;
             }));
         }
     });
@@ -80,7 +80,7 @@ module.exports.getEmployeesByDepartment = function (department){
         else{
             resolve(Employee.filter(function(item, index, array){
 
-                return item.department = department;
+                return item.department == department;
             })); 
         }
     });
@@ -91,7 +91,7 @@ module.exports.getEmployeesByManager = function (manager){
             reject("no results returned");
         }
         resolve(Employee.filter(function(item, index, array){
-            return item.employeeManagerNum = manager;
+            return item.employeeManagerNum == manager;
         }));
     });
 }
@@ -141,5 +141,16 @@ module.exports.addEmployee = function(employeeData){
             Employee.push(employeeData);
             resolve(Employee);
         }
+    });
+}
+module.exports.updateEmployee = function(employeeData){
+    return new Promise ((resolve, reject)=>{
+        employeeData.isManager = (employeeData.isManager) ? true : false;
+        console.log("have inside updateEmployee function, employeeNum= " + employeeData.employeeNum);     
+        resolve(Employee.update(employeeData,{
+            where: {employeeNum: employeeData.employeeNum}
+        })
+        .then(()=>{resolve();})
+        .catch((err)=>{reject("unable to create employee");});
     });
 }
