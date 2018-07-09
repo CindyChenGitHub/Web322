@@ -147,10 +147,23 @@ module.exports.updateEmployee = function(employeeData){
     return new Promise ((resolve, reject)=>{
         employeeData.isManager = (employeeData.isManager) ? true : false;
         console.log("have inside updateEmployee function, employeeNum= " + employeeData.employeeNum);     
-        resolve(Employee.update(employeeData,{
-            where: {employeeNum: employeeData.employeeNum}
+        return new Promise (function(resolve, reject){
+            if(Employee.length == 0){
+                reject("no results returned");
+            }
+            else{
+                resolve(Employee.find(function(item, index, array){
+                    return item = employeeData;
+                }));
+            }
+        });
+/*         Employee.update((employeeData)=>{
+            console.log(employeeData.firstName);
+            console.log("in resolve");
+            Employee[indexOf(employeeNum == employeeData.employeeNum)] = employeeData;
+            console.log(Employee[indexOf(employeeNum == employeeData.employeeNum)] );
         })
         .then(()=>{resolve();})
-        .catch((err)=>{reject("unable to create employee");});
+        .catch((err)=>{reject("unable to create employee");}); */
     });
 }
