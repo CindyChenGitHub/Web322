@@ -1,5 +1,5 @@
 /*********************************************************************************
-*  WEB322 – Assignment 03
+*  WEB322 – Assignment 05
 *  I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part *  of this assignment has been copied manually or electronically from any other source 
 *  (including 3rd party web sites) or distributed to other students.
 * 
@@ -67,7 +67,7 @@ module.exports.getEmployeesByStatus = function (status){
         }
         else{
             resolve(Employee.filter(function(item, index, array){
-                return item.status = status;
+                return item.status == status;
             }));
         }
     });
@@ -80,7 +80,7 @@ module.exports.getEmployeesByDepartment = function (department){
         else{
             resolve(Employee.filter(function(item, index, array){
 
-                return item.department = department;
+                return item.department == department;
             })); 
         }
     });
@@ -91,12 +91,12 @@ module.exports.getEmployeesByManager = function (manager){
             reject("no results returned");
         }
         resolve(Employee.filter(function(item, index, array){
-            return item.employeeManagerNum = manager;
+            return item.employeeManagerNum == manager;
         }));
     });
 }
 module.exports.getEmployeeByNum = function (num){
-    console.log("have inside getEmployeeByNum function, num=" + num);
+    //console.log("have inside getEmployeeByNum function, num=" + num);
     return new Promise (function(resolve, reject){
         if(Employee.length == 0){
             reject("no results returned");
@@ -109,7 +109,7 @@ module.exports.getEmployeeByNum = function (num){
     });
 }
 module.exports.getManagers = function(){
-    console.log("have inside getManagers function");
+    //console.log("have inside getManagers function");
     return new Promise (function (resolve, reject){
         if(Employee.length == 0){
             reject("no results returned");
@@ -120,7 +120,7 @@ module.exports.getManagers = function(){
     });
 }
 module.exports.getDepartments = function(){
-    console.log("have inside getDepartments function");
+    //console.log("have inside getDepartments function");
     return new Promise (function(resolve, reject){
         if(Department.length == 0){
             reject("no results returned");
@@ -141,5 +141,37 @@ module.exports.addEmployee = function(employeeData){
             Employee.push(employeeData);
             resolve(Employee);
         }
+    });
+}
+module.exports.updateEmployee = function(employeeData){
+    employeeData.isManager = (employeeData.isManager) ? true : false;
+    return new Promise ((resolve, reject)=>{
+        for( let i = 0; i< Employee.length; i++){
+            if(Employee[i].employeeNum == employeeData.employeeNum){
+                Employee[i] = employeeData;
+            }
+        }
+        resolve();
+    
+        //console.log("have inside updateEmployee function, employeeNum= " + employeeData.employeeNum);     
+       /* return new Promise (function(resolve, reject){
+            if(Employee.length == 0){
+                reject("no results returned");
+            }
+            else{
+                resolve(Employee.find(function(item, index, array){
+                    return item = employeeData;
+                }));
+            }
+        });*/
+        /* Employee.update(employeeData,{
+            //console.log(employeeData.firstName);
+            //console.log("in resolve");
+            //Employee[indexOf(employeeNum == employeeData.employeeNum)] = employeeData;
+            where:{employeeNum: employeeData.employeeNum}
+            //console.log(Employee[indexOf(employeeNum == employeeData.employeeNum)] );
+        })
+        .then(()=>{resolve();})
+        .catch((err)=>{reject("unable to create employee");}); */
     });
 }
