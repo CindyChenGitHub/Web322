@@ -5,7 +5,7 @@
 * 
 *  Name: _______Yue Chen_________ Student ID: ___150612166___ Date: ____June 15,2018____
 *
-*  Online (Heroku) Link: _____https://yue-chen-web322-assignment.herokuapp.com/__________
+*  Online (Heroku) Link: _____   https://yue-chen-web322-assignment.herokuapp.com/   __________
 *
 ********************************************************************************/ 
 
