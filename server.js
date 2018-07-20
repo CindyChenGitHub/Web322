@@ -136,18 +136,54 @@ app.get("/employees",(req,res,Employees)=>{
         }
 })
 // setup a 'route' to get employees by empNum
-app.get("/employee/:num",(req,res)=>{
+app.get("/employee/:num",(req,res,data)=>{
+    // initialize an empty object to store the values
+    let viewData = {};
     var num = req.params.num;
     dataservice.getEmployeeByNum(num)
     .then((data)=>{
-        res.render("employee", {employee:data});
-        //else res.status(404).send("Employee Not Found");
+        if (data) {
+            viewData.employee = data; //store employee data in the "viewData" object as "employee"
+        } 
+        else {
+            viewData.employee = null; // set employee to null if none were returned
+        }
     })
-    .catch(()=>{
-        res.status(404).send("Employee Not Found"); 
-        //res.render("employee",{message:"no results"}); 
+    .catch(() => {
+        viewData.employee = null; // set employee to null if there was an error 
+    })
+    .then(dataservice.getDepartments) 
+    .then((data) => {
+        console.log("after new getDepartments, then, data: " + data);
+        viewData.departments = data; // store department data in the "viewData" object as "departments"
+        console.log ("in new fun, viewData.departments: " + viewData.departments);
+        // loop through viewData.departments and once we have found the departmentId that matches
+        // the employee's "department" value, add a "selected" property to the matching 
+        // viewData.departments object
+
+        for (let i = 0; i < viewData.departments.length; i++) {
+            if (viewData.departments[i].departmentId == viewData.employee.department) {
+                viewData.departments[i].selected = true;
+                console.log("in new fun, for " + i + ": ");
+                console.log("in new fun, viewData.departments" + i + ": " + viewData.departments[i]);
+            }
+        }
+    })
+    .catch(() => {
+        console.log("in new fun.catch");
+        viewData.departments = []; // set departments to empty if there was an error
+    })
+    //)
+    .then(() => {
+        if (viewData.employee == null) { // if no employee - return an error
+            res.status(404).send("Employee Not Found");
+        } 
+        else {
+            console.log("in new fun, last then, viewData.departments: " + viewData.departments);
+            res.render("employee", { viewData: viewData }); // render the "employee" view
+        }
     });
-})
+});
 // setup a 'route' to get departments data
 app.get("/departments",(req,res,Departments)=>{
     dataservice.getDepartments()
