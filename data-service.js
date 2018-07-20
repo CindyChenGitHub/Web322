@@ -3,7 +3,7 @@
 *  I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part *  of this assignment has been copied manually or electronically from any other source 
 *  (including 3rd party web sites) or distributed to other students.
 * 
-*  Name: _______YC_________ Student ID: ___****___ Date: ____June 15,2018____
+*  Name: _______Yue Chen_________ Student ID: ___150612166___ Date: ____July 20,2018____
 *
 *  Online (Heroku) Link: _____   https://yue-chen-web322-assignment.herokuapp.com/   __________
 *
@@ -14,17 +14,16 @@ var sequelize = new Sequelize ( 'dabtq46lnn68cm', 'wlhvaludlhhecv', '781571', {
     host: 'ec2-23-21-162-90.compute-1.amazonaws.com',
     dialect: 'postgres',
     port: 5432,
-    dialectOptions: {
-        ssl: true
-    }
+    dialectOptions: { ssl: true }
 });
+
 sequelize
     .authenticate()
-    .then(function() {
+    .then(()=> {
         console.log('Connection has been established successfully.');
     })
-    .catch(function(err) {
-        console.log('Unable to connect to the database:', err);
+    .catch(() =>{
+        res.status(500).send('Unable to connect to the database:');
     });
 
 const Employees = sequelize.define('Employees', {
@@ -58,24 +57,19 @@ var Departments = sequelize.define('Departments', {
 });
 
 module.exports.initialize = function (){
-    console.log("in function initialize");
     return new Promise(function (resolve, reject) {
-        console.log("into Promise");
         sequelize.sync()
         .then(()=>{
-            console.log("into then");
             resolve();
         })
-        .catch((err)=>{
+        .catch(()=>{
             reject("unable to sync the database");
         });
     });
 };
 
 module.exports.getAllEmployees = function (){
-    console.log("in getAllEmployees function");
     return new Promise(function (resolve, reject) {
-        console.log("in getAllEmployees function");
         Employees.findAll()
         .then((data)=>{
             console.log("in then, data: "+ data);
@@ -215,6 +209,19 @@ module.exports.updateEmployee = function(employeeData){
         });   
     });
 };
+module.exports.deleteEmployeeByNum = function(num){
+    return new Promise(function(resolve,reject){
+        Employees.destroy({
+            where:{employeeNum:num}
+        })
+        .then(()=>{
+            resolve("destroyed");
+        })
+        .catch(()=>{
+            reject("was rejected");
+        })
+    })
+}
 module.exports.getDepartments = function(){
     console.log("have inside getDepartments function");
     return new Promise(function (resolve, reject) {

@@ -3,7 +3,7 @@
 *  I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part *  of this assignment has been copied manually or electronically from any other source 
 *  (including 3rd party web sites) or distributed to other students.
 * 
-*  Name: _______Yue Chen_________ Student ID: ___150612166___ Date: ____June 15,2018____
+*  Name: _______Yue Chen_________ Student ID: ___150612166___ Date: ____July 20,2018____
 *
 *  Online (Heroku) Link: _____   https://yue-chen-web322-assignment.herokuapp.com/   __________
 *
@@ -182,7 +182,10 @@ app.get("/employee/:num",(req,res,data)=>{
             console.log("in new fun, last then, viewData.departments: " + viewData.departments);
             res.render("employee", { viewData: viewData }); // render the "employee" view
         }
-    });
+    })
+    .catch(()=>{
+        res.status(500).send("Unable to get Employee");
+    })
 });
 // setup a 'route' to get departments data
 app.get("/departments",(req,res,Departments)=>{
@@ -220,6 +223,16 @@ app.get("/employees/add",(req,res,Departments)=>{
         res.render("addEmployee", {Departments: []}) 
     });
 });
+app.get("/employees/delete/:num",(req,res)=>{
+    var num = req.params.num;
+    dataservice.deleteEmployeeByNum(num)
+    .then(()=>{
+        res.redirect("/employees");
+    })
+    .catch(()=>{
+        res.status(500).send("Unable to Remove Employee / Employee not found)");
+    })
+})
 // setup a get 'route' to display add department web site
 app.get("/departments/add",(req,res)=>{
     res.render('addDepartment');
@@ -244,7 +257,8 @@ app.post("/employees/add", (req, res, Employees) => {
 // setup a post 'route' to update employees
 app.post("/employee/update", (req, res) => {
     dataservice.updateEmployee(req.body)
-    .then(()=>{res.redirect("/employees");});
+    .then(()=>{res.redirect("/employees");})
+    .catch(()=>{res.status(500).send("Unable to Update Employee");});
 });
 // setup a post 'route' to add department
 app.post("/departments/add", (req, res,Employees) => {
@@ -262,7 +276,10 @@ app.post("/departments/add", (req, res,Employees) => {
 // setup a post 'route' to update department
 app.post("/department/update", (req, res) => {
     dataservice.updateDepartment(req.body)
-    .then(()=>{res.redirect("/departments");});
+    .then(()=>{res.redirect("/departments");})
+    .catch( ()=>{
+        res.status(500).send("Unnable to update department");
+    })
 });
 // setup a post 'route' to add image
 app.post("/images/add", upload.single(("imageFile")), (req, res) => {
