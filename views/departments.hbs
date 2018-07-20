@@ -4,7 +4,6 @@
             <a href="/departments/add" class="btn btn-success pull-right">Add New Department</a>
           </h2>
           <hr />
-
           <div class = "table-responsive">
             <table class = "table">
                 <thead>
@@ -17,7 +16,7 @@
                     {{#each Department}}
                         <tr>
                             <td><a href = "/employees?department={{departmentId}}">{{departmentId}}</a></td>
-                            <td><a href = "/employees?department={{departmentId}}">{{departmentName}}</a></td>
+                            <td><a href = "/department/{{departmentId}}">{{departmentName}}</a></td>
                         </tr>
                     {{/each}}
                 </tbody>

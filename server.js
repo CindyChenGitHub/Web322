@@ -191,8 +191,8 @@ app.get("/department/:num",(req,res)=>{
     var num = req.params.num;
     dataservice.getDepartmentById(num)
     .then((data)=>{
-        if(data.length > 0) res.render("department",{department:data}); 
-        else res.status(404).send("Department Not Found");
+        res.render("department",{department:data}); 
+        //else res.status(404).send("Department Not Found");
     })
     .catch(()=>{
         res.status(404).send("Department Not Found"); 
