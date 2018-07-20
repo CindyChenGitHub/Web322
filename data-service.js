@@ -123,8 +123,10 @@ module.exports.getAllEmployees = function (){
         }
     }) */
     return new Promise(function (resolve, reject) {
+        console.log("in getAllEmployees function");
         Employee.findAll()
         .then((data)=>{
+            console.log("in then, data: "+ data);
             resolve(data);
         })
         .catch(()=>{
@@ -171,7 +173,7 @@ module.exports.getEmployeesByDepartment = function (department){
     }); */
     return new Promise(function (resolve, reject) {
         Employee.findAll({
-            where:{departments:department}
+            where:{department:department}
         })
         .then((data)=>{
             resolve(data);
@@ -217,6 +219,7 @@ module.exports.getEmployeeByNum = function (num){
     }); */
     return new Promise(function (resolve, reject) {
         Employee.findAll({
+            //attributes:[*],
             where:{employeeNum:num}
         })
         .then((data)=>{
@@ -241,28 +244,11 @@ module.exports.getEmployeeByNum = function (num){
         reject();
 });
 }; */
-module.exports.getDepartments = function(){
-    console.log("have inside getDepartments function");
-/*     return new Promise (function(resolve, reject){
-        if(Department.length == 0){
-            reject("no results returned");
-        }
-        else{
-            resolve(Department);
-        }
-    }); */
-    return new Promise(function (resolve, reject) {
-        Department.findAll()
-        .then((data)=>{
-            resolve(data);
-        })
-        .catch(()=>{
-            reject("no results returned");
-        });   
-    });
-};
+
 module.exports.addEmployee = function(employeeData){
     console.log(" in addEmployee function");
+    console.log("employeeData.firstName: " + employeeData.firstName);
+    
 /*     return new Promise (function(resolve, reject){
         employeeData.isManager = (employeeData.isManager) ? true : false;
         employeeData.employeeNum = Employee.length+1;
@@ -275,6 +261,7 @@ module.exports.addEmployee = function(employeeData){
         }
     }); */
     return new Promise(function (resolve, reject) {
+        console.log("in data-server->addEmployee function->promise");
         employeeData.isManager = (employeeData.isManager) ? true : false;
         for (const prop in employeeData) {
             if (employeeData[prop] == "") employeeData[prop] = null;
@@ -298,7 +285,8 @@ module.exports.addEmployee = function(employeeData){
         })
         .then(()=>{
             console.log("successfully created a new employee");
-            resolve();
+            //console.log(Employee[1].employeeNum);
+            resolve(Employee[1]);
         })
         .catch(()=>{
             reject("unable to create employee");
@@ -344,10 +332,103 @@ module.exports.updateEmployee = function(employeeData){
         })
         .then(()=>{
             console.log("successfully update a employee");
-            resolve();
+            resolve(Employee);
         })
         .catch(()=>{
             reject("unable to update employee");
+        });   
+    });
+};
+
+module.exports.getDepartments = function(){
+    console.log("have inside getDepartments function");
+/*     return new Promise (function(resolve, reject){
+        if(Department.length == 0){
+            reject("no results returned");
+        }
+        else{
+            resolve(Department);
+        }
+    }); */
+    return new Promise(function (resolve, reject) {
+        Department.findAll()
+        .then((data)=>{
+            resolve(data);
+        })
+        .catch(()=>{
+            reject("no results returned");
+        });   
+    });
+};
+module.exports.getDepartmentById = function (num){
+    console.log("have inside getDepartmentById function, Id=" + num);
+/*     return new Promise (function(resolve, reject){
+        if(Employee.length == 0){
+            reject("no results returned");
+        }
+        else{
+            resolve(Employee.find(function(item, index, array){
+                return item.employeeNum == num;
+            }));
+        }
+    }); */
+    return new Promise(function (resolve, reject) {
+        Department.findAll({
+            where:{departmentId:num}
+        })
+        .then((data)=>{
+            resolve(data[0]);
+        })
+        .catch(()=>{
+            reject("no results returned");
+        })
+    });
+};
+module.exports.addDepartment = function(departmentData){
+    console.log(" in addDepartment function");
+    //console.log("departmentData.    : " + employeeData.firstName);
+
+    return new Promise(function (resolve, reject) {
+        console.log("in data-server->addDepartment function->promise");
+        //employeeData.isManager = (employeeData.isManager) ? true : false;
+        for (const prop in departmentData) {
+            if (departmentData[prop] == "") departmentData[prop] = null;
+        };
+        Department.create({
+            departmentId: departmentData.departmentId,
+            departmentName: departmentData.departmentName
+        })
+        .then(()=>{
+            console.log("successfully created a new department");
+            console.log(Department[1]);
+            resolve(Department[1]);
+        })
+        .catch(()=>{
+            reject("unable to create department");
+        });   
+    });
+};
+module.exports.updateDepartment = function(departmentData){
+    console.log("in updateDepartment function");
+    return new Promise(function (resolve, reject) {
+        //departmentData.isManager = (employeeData.isManager) ? true : false;
+        for (const prop in departmentData) {
+            if (departmentData[prop] == "") departmentData[prop] = null;
+        };
+        Department.update(
+        {
+            departmentId: departmentData.departmentId,
+            departmentName: departmentData.departmentName
+        },
+        {
+            where:{departmentId:departmentData.departmentId}
+        })
+        .then(()=>{
+            console.log("successfully update a department");
+            resolve(Department);
+        })
+        .catch(()=>{
+            reject("unable to update department");
         });   
     });
 };

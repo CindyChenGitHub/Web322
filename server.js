@@ -77,15 +77,7 @@ app.get("/home",(req,res)=>{
 app.get("/about",(req,res)=>{
     res.render('about');
 });
-// setup a get 'route' to display add employee web site
-app.get("/employees/add",(req,res)=>{
-    res.render('addEmployee');
-});
 
-// setup a get 'route' to display add image web site
-app.get("/images/add",(req,res)=>{
-    res.render('addImage');
-});
 
 // Get datas  -----------------------------------------
 // setup a 'route' to get image data
@@ -96,58 +88,71 @@ app.get("/images", (req,res) =>{
     });
 });
 // setup a 'route' to get employees data
-app.get("/employees",(req,res)=>{
-    if (req.query.length > 0){ 
-        if (req.query.status){
-            dataservice.getEmployeesByStatus(req.query.status) 
-            .then((data)=>{
-                res.render("employees",{employees:data});
-            })
-            .catch(()=>{
-                res.render({message: "no results"});
-            })
-        }  
-        else if (req.query.department){
-            dataservice.getEmployeesByDepartment(req.query.department)
-            .then((data)=>{
-                res.render("employees",{employees:data});
-            })
-            .catch(()=>{
-                res.render({message: "no results"});
-            })
-        }   
-        else if (req.query.manager){
-            dataservice.getEmployeesByManager(req.query.manager)
-            .then((data)=>{
-                res.render("employees",{employees:data});
-            })
-            .catch(()=>{
-                res.render({message: "no results"});
-            })
-        }   
+app.get("/employees",(req,res,Employee)=>{
+    console.log("in app.get /employees, query.length: " + req.query.length);
+    console.log("in app.get /employees, Employee.length: " + Employee.length);
+    //if (Employee != null){
+        //if (req.query.length > 0){ 
+            if (req.query.status){
+                dataservice.getEmployeesByStatus(req.query.status) 
+                .then((data)=>{
+                    if (data.length>0)  res.render("employees",{Employee:data});
+                    else res.render("employees",{ message: "no results" });
+                })
+                .catch(()=>{
+                    res.render("employees",{message: "no results"});
+                })
+            }  
+            else if (req.query.department){
+                dataservice.getEmployeesByDepartment(req.query.department)
+                .then((data)=>{
+                    if (data.length>0)  res.render("employees",{Employee:data});
+                    else res.render("employees",{ message: "no results" });
+                })
+                .catch(()=>{
+                    res.render("employees",{message: "no results"});
+                })
+            }   
+            else if (req.query.manager){
+                dataservice.getEmployeesByManager(req.query.manager)
+                .then((data)=>{
+                    if (data.length>0)  res.render("employees",{Employee:data});
+                    else res.render("employees",{ message: "no results" });
+                })
+                .catch(()=>{
+                    res.render("employees",{message: "no results"});
+                })
+            }
+        //}
         else{
             dataservice.getAllEmployees()
             .then((data)=>{
-                res.render("employees",{employees:data});
+                console.log("in else, getAllEmployees.then, data: " + data)
+                if (data.length > 0) res.render("employees",{Employee:data});
+                else res.render("employees",{ message: "no results" });
             })
             .catch(()=>{
-                res.render({message: "no results"});
+                console.log("in first catch");
+                res.render("employees",{message: "no results"});
             });
         }
-    }
-    else{
+    //}
+/*      else{
+        console.log("in second catch");
         res.render("employees",{ message: "no results" });
-    }
+    }  */
 })
 // setup a 'route' to get employees by empNum
 app.get("/employee/:num",(req,res)=>{
     var num = req.params.num;
     dataservice.getEmployeeByNum(num)
     .then((data)=>{
-        res.render("employee", { employee: data }); 
+        res.render("employee", {employee:data});
+        //else res.status(404).send("Employee Not Found");
     })
     .catch(()=>{
-        res.render("employee",{message:"no results"}); 
+        res.status(404).send("Employee Not Found"); 
+        //res.render("employee",{message:"no results"}); 
     });
 })
 /* 
@@ -163,30 +168,60 @@ app.get("/managers",(req,res)=>{
 })
 */
 // setup a 'route' to get departments data
-app.get("/departments",(req,res)=>{
-    if (req.query.length > 0){ 
-        console.log("in if");
+app.get("/departments",(req,res,Department)=>{
+    //if (req.query.length > 0){ 
+        //console.log("in if");
         dataservice.getDepartments()
         .then((data)=>{
             console.log("in then");
-            res.render("departments", {departments: data});
+            if (data.length > 0) res.render("departments", {Department: data});
+            else res.render("departments",{message: "no results"});
         })
         .catch(()=>{
             console.log("in catch");
             res.render("departments",{message: "no results"});
         });
-    }
-    else{
+    //}
+/*     else{
         console.log(" in else");
         res.render( "departments", {message: "no results"} );
-    }
+    } */
 })
+app.get("/department/:num",(req,res)=>{
+    var num = req.params.num;
+    dataservice.getDepartmentById(num)
+    .then((data)=>{
+        if(data.length > 0) res.render("department",{department:data}); 
+        else res.status(404).send("Department Not Found");
+    })
+    .catch(()=>{
+        res.status(404).send("Department Not Found"); 
+    });
+})
+// GET ADD -----------------------------------------
+// setup a get 'route' to display add employee web site
+app.get("/employees/add",(req,res)=>{
+    res.render('addEmployee');
+});
+// setup a get 'route' to display add department web site
+app.get("/departments/add",(req,res)=>{
+    res.render('addDepartment');
+});
+
+// setup a get 'route' to display add image web site
+app.get("/images/add",(req,res)=>{
+    res.render('addImage');
+});
 
 // POST -----------------------------------------
 // setup a post 'route' to add employees
-app.post("/employees/add", (req, res) => {
+app.post("/employees/add", (req, res, Employee) => {
+    console.log("in /employees/add POST route");
+    //console.log("req.body: "+ req.body.toArray());
     dataservice.addEmployee(req.body) 
-    .then(()=>{
+    .then((Employee)=>{
+        console.log("in /employees/add POST ->then");
+        //console.log("data: " + data);
         res.redirect("/employees");
     })
     .catch(()=>{
@@ -201,6 +236,24 @@ app.post("/employees/add", (req, res) => {
 app.post("/employee/update", (req, res) => {
     dataservice.updateEmployee(req.body)
     .then(()=>{res.redirect("/employees");});
+    //res.redirect("/employees");
+});
+app.post("/departments/add", (req, res,Employee) => {
+    console.log("in /department/add POST route");
+    console.log("req.body: "+ req.body);
+    dataservice.addDepartment(req.body) 
+    .then((Employee)=>{
+        console.log("in /department/add POST ->then");
+        res.redirect("/departments");
+    })
+    .catch(()=>{
+        console.log("unable to add department");
+    });
+});
+
+app.post("/department/update", (req, res) => {
+    dataservice.updateDepartment(req.body)
+    .then(()=>{res.redirect("/departments");});
     //res.redirect("/employees");
 });
 
