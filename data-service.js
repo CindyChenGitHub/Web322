@@ -60,7 +60,7 @@ module.exports.initialize = function (){
     return new Promise(function (resolve, reject) {
         sequelize.sync()
         .then(()=>{
-            resolve();
+            resolve("have sync the database");
         })
         .catch(()=>{
             reject("unable to sync the database");
@@ -72,16 +72,15 @@ module.exports.getAllEmployees = function (){
     return new Promise(function (resolve, reject) {
         Employees.findAll()
         .then((data)=>{
-            console.log("in then, data: "+ data);
             resolve(data);
         })
         .catch(()=>{
-            reject("no results returned");
+            reject("no employee returned");
         });   
     });
 };
+
 module.exports.getEmployeesByStatus = function (status){
-    console.log("in getEmployeesByStatus function");
     return new Promise(function (resolve, reject) {
         Employees.findAll({
             where:{status:status}
@@ -90,12 +89,12 @@ module.exports.getEmployeesByStatus = function (status){
             resolve(data);
         })
         .catch(()=>{
-            reject("no results returned");
+            reject("no employee returned");
         })
     });
 };
+
 module.exports.getEmployeesByDepartment = function (department){
-    console.log("in getEmployeesByDepartment function");
     return new Promise(function (resolve, reject) {
         Employees.findAll({
             where:{department:department}
@@ -104,12 +103,12 @@ module.exports.getEmployeesByDepartment = function (department){
             resolve(data);
         })
         .catch(()=>{
-            reject("no results returned");
+            reject("no employee returned");
         })
     });
 };
+
 module.exports.getEmployeesByManager = function (manager){
-    console.log("in getEmployeesByManager function");
     return new Promise(function (resolve, reject) {
         Employees.findAll({
             where:{employeeManagerNum:manager}
@@ -118,12 +117,12 @@ module.exports.getEmployeesByManager = function (manager){
             resolve(data);
         })
         .catch(()=>{
-            reject("no results returned");
+            reject("no employee returned");
         })
     });
 };
+
 module.exports.getEmployeeByNum = function (num){
-    console.log("have inside getEmployeeByNum function, num=" + num);
     return new Promise(function (resolve, reject) {
         Employees.findAll({
             where:{employeeNum:num}
@@ -132,15 +131,13 @@ module.exports.getEmployeeByNum = function (num){
             resolve(data[0]);
         })
         .catch(()=>{
-            reject("no results returned");
+            reject("no employee returned");
         })
     });
 };
+
 module.exports.addEmployee = function(employeeData){
-    console.log(" in addEmployee function");
-    console.log("employeeData.firstName: " + employeeData.firstName);
     return new Promise(function (resolve, reject) {
-        console.log("in data-server->addEmployee function->promise");
         employeeData.isManager = (employeeData.isManager) ? true : false;
         for (const prop in employeeData) {
             if (employeeData[prop] == "") employeeData[prop] = null;
@@ -164,7 +161,6 @@ module.exports.addEmployee = function(employeeData){
         })
         .then(()=>{
             console.log("successfully created a new employee");
-            //console.log(Employee[1].employeeNum);
             resolve(Employees[1]);
         })
         .catch(()=>{
@@ -172,8 +168,8 @@ module.exports.addEmployee = function(employeeData){
         });   
     });
 };
+
 module.exports.updateEmployee = function(employeeData){
-    console.log("in updateEmployee function");
     return new Promise(function (resolve, reject) {
         employeeData.isManager = (employeeData.isManager) ? true : false;
         for (const prop in employeeData) {
@@ -209,33 +205,34 @@ module.exports.updateEmployee = function(employeeData){
         });   
     });
 };
+
 module.exports.deleteEmployeeByNum = function(num){
     return new Promise(function(resolve,reject){
         Employees.destroy({
             where:{employeeNum:num}
         })
         .then(()=>{
-            resolve("destroyed");
+            resolve("destroyed an employee");
         })
         .catch(()=>{
-            reject("was rejected");
+            reject("destroy employee was rejected");
         })
     })
 }
+
 module.exports.getDepartments = function(){
-    console.log("have inside getDepartments function");
     return new Promise(function (resolve, reject) {
         Departments.findAll()
         .then((data)=>{
             resolve(data);
         })
         .catch(()=>{
-            reject("no results returned");
+            reject("no department returned");
         });   
     });
 };
+
 module.exports.getDepartmentById = function (num){
-    console.log("have inside getDepartmentById function, Id=" + num);
     return new Promise(function (resolve, reject) {
         Departments.findAll({
             where:{departmentId:num}
@@ -244,14 +241,13 @@ module.exports.getDepartmentById = function (num){
             resolve(data[0]);
         })
         .catch(()=>{
-            reject("no results returned");
+            reject("no department returned");
         })
     });
 };
+
 module.exports.addDepartment = function(departmentData){
-    console.log(" in addDepartment function");
     return new Promise(function (resolve, reject) {
-        console.log("in data-server->addDepartment function->promise");
         for (const prop in departmentData) {
             if (departmentData[prop] == "") departmentData[prop] = null;
         };
@@ -261,7 +257,6 @@ module.exports.addDepartment = function(departmentData){
         })
         .then(()=>{
             console.log("successfully created a new department");
-            console.log(Departments[1]);
             resolve(Departments[1]);
         })
         .catch(()=>{
@@ -269,8 +264,8 @@ module.exports.addDepartment = function(departmentData){
         });   
     });
 };
+
 module.exports.updateDepartment = function(departmentData){
-    console.log("in updateDepartment function");
     return new Promise(function (resolve, reject) {
         for (const prop in departmentData) {
             if (departmentData[prop] == "") departmentData[prop] = null;
