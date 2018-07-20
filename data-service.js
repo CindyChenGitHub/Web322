@@ -71,7 +71,7 @@ const Employee = sequelize.define('Employee', {
     department: Sequelize.INTEGER,
     hireDate: Sequelize.STRING
 });
-var Department = sequelize.define('Department', {
+var Departments = sequelize.define('Departments', {
     departmentId: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -342,16 +342,8 @@ module.exports.updateEmployee = function(employeeData){
 
 module.exports.getDepartments = function(){
     console.log("have inside getDepartments function");
-/*     return new Promise (function(resolve, reject){
-        if(Department.length == 0){
-            reject("no results returned");
-        }
-        else{
-            resolve(Department);
-        }
-    }); */
     return new Promise(function (resolve, reject) {
-        Department.findAll()
+        Departments.findAll()
         .then((data)=>{
             resolve(data);
         })
@@ -373,7 +365,7 @@ module.exports.getDepartmentById = function (num){
         }
     }); */
     return new Promise(function (resolve, reject) {
-        Department.findAll({
+        Departments.findAll({
             where:{departmentId:num}
         })
         .then((data)=>{
@@ -394,14 +386,14 @@ module.exports.addDepartment = function(departmentData){
         for (const prop in departmentData) {
             if (departmentData[prop] == "") departmentData[prop] = null;
         };
-        Department.create({
+        Departments.create({
             departmentId: departmentData.departmentId,
             departmentName: departmentData.departmentName
         })
         .then(()=>{
             console.log("successfully created a new department");
-            console.log(Department[1]);
-            resolve(Department[1]);
+            console.log(Departments[1]);
+            resolve(Departments[1]);
         })
         .catch(()=>{
             reject("unable to create department");
@@ -415,7 +407,7 @@ module.exports.updateDepartment = function(departmentData){
         for (const prop in departmentData) {
             if (departmentData[prop] == "") departmentData[prop] = null;
         };
-        Department.update(
+        Departments.update(
         {
             departmentId: departmentData.departmentId,
             departmentName: departmentData.departmentName
@@ -425,7 +417,7 @@ module.exports.updateDepartment = function(departmentData){
         })
         .then(()=>{
             console.log("successfully update a department");
-            resolve(Department);
+            resolve(Departments);
         })
         .catch(()=>{
             reject("unable to update department");

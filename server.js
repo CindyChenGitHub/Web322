@@ -128,8 +128,8 @@ app.get("/employees",(req,res,Employee)=>{
             dataservice.getAllEmployees()
             .then((data)=>{
                 console.log("in else, getAllEmployees.then, data: " + data)
-                if (data.length > 0) res.render("employees",{Employee:data});
-                else res.render("employees",{ message: "no results" });
+                res.render("employees",{Employee:data});
+                //else res.render("employees",{ message: "no results" });
             })
             .catch(()=>{
                 console.log("in first catch");
@@ -168,13 +168,13 @@ app.get("/managers",(req,res)=>{
 })
 */
 // setup a 'route' to get departments data
-app.get("/departments",(req,res,Department)=>{
+app.get("/departments",(req,res,Departments)=>{
     //if (req.query.length > 0){ 
         //console.log("in if");
         dataservice.getDepartments()
         .then((data)=>{
-            console.log("in then");
-            if (data.length > 0) res.render("departments", {Department: data});
+            console.log("in app.get /departments->then");
+            if (data.length > 0) res.render("departments", {Departments: data});
             else res.render("departments",{message: "no results"});
         })
         .catch(()=>{
@@ -200,8 +200,15 @@ app.get("/department/:num",(req,res)=>{
 })
 // GET ADD -----------------------------------------
 // setup a get 'route' to display add employee web site
-app.get("/employees/add",(req,res)=>{
-    res.render('addEmployee');
+app.get("/employees/add",(req,res,Departments)=>{
+    dataservice.getDepartments()
+    .then((data)=>{
+        console.log("in /employee/add rout ->then, data: " + data)
+        res.render("addEmployee", {Departments: data});
+    })
+    .catch(()=>{
+        res.render("addEmployee", {Departments: []}) 
+    });
 });
 // setup a get 'route' to display add department web site
 app.get("/departments/add",(req,res)=>{
