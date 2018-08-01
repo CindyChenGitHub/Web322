@@ -11,17 +11,20 @@
 
 const HTTP_PORT = process.env.PORT||8080;
 const express = require('express');
-const dataservice = require("./data-service.js");
-const bodyParser = require("body-parser");
 const app = express();
 const path = require("path");
+const dataservice = require("./data-service.js");
+const dataServiceAuth = require("./data-service-auth.js");
+
 const fs = require('fs');
+const bodyParser = require("body-parser");
+
 const multer = require("multer");
 const exphbs = require("express-handlebars");
-const dataServiceAuth = require("./data-service-auth.js");
 const clientSessions = require("client-sessions");
 
 app.use(express.static('public'));
+//app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }) );
 app.use(clientSessions({
     cookieName: "session",
@@ -69,6 +72,7 @@ function onHttpStart(){
 };
 
 app.use(function(req,res,next){
+    console.log("f50");
     let route = req.baseUrl + req.path;
     app.locals.activeRoute = (route == "/") ? "/" : route.replace(/\/$/, "");
     next();
@@ -106,11 +110,11 @@ app.get("/about",(req,res)=>{
 
 // GET/POST LOG -------------------------------------
 app.get("/login", (req,res)=>{
-    res.render("login",{});
+    res.render("login");
 });
 app.post("/login", (req, res)=>{
     req.body.userAgent = req.get('User-Agent');
-    dataServiceAuth.CheckUser(req.body.userData)
+    dataServiceAuth.checkUser(req.body)
     .then((user)=>{
         req.session.user = {
             userName: user.userName,// authenticated user's userName
@@ -125,23 +129,27 @@ app.post("/login", (req, res)=>{
 
 })
 app.get("/register", (req,res)=>{
-    res.render("register",{});
+    res.render("register");
 });
-app.post("/register", (req,res,data)=>{
-    dataServiceAuth.RegisterUser(req.body.userData)
+app.post("/register", (req,res)=>{
+    console.log("f0, data= "+ JSON.stringify(req.body));
+    dataServiceAuth.registerUser(req.body)
     .then(()=>{
+        console.log("f1, userData: " );
         res.render("register", {successMessage: "User created"});
     })
     .catch((err)=>{
-        res.render("register",{errorMessage: err, userName: req.body.userName});
+        console.log("f2, errorCode: " + JSON.stringify(req.body.userName)+err);
+        res.render("register",{errorMessage: err, userName: JSON.stringify(req.body.userName)});
     })
 });
 app.get("/logout", (req, res)=>{
     req.session.reset();
     res.redirect("/");
 })
-app.get("/userHistory", ensureLogin, (req, res)=>{
-    res.render("userHistory",{});
+app.get("/userHistory", ensureLogin, (req, res, users)=>{
+    console.log("f60, body = " + JSON.stringify(req.session.user));
+    res.render("userHistory",{user:req.session.user});
 })
 
 // Get datas  -----------------------------------------
