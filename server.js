@@ -41,7 +41,7 @@ app.use(function(req, res, next) {
 
 function ensureLogin (req, res, next){
     
-    console.log("f90, in ensureLogin, req.session.user: "+ req.session.user);
+    console.log("f90, in ensureLogin, req.session.user: "+ JSON.stringify(req.session.user));
     if (!(req.session.user)){
         res.redirect("/login");
     }
@@ -164,10 +164,16 @@ app.get("/logout", (req, res)=>{
     res.redirect("/");
 })
 app.get("/userHistory", ensureLogin, (req, res)=>{
+    
+    user = {
+        userName: req.session.userName,// authenticated user's userName
+        email: req.session.email,// authenticated user's email
+        loginHistory: req.session.loginHistory// authenticated user's loginHistory
+    };
     console.log("f60, user = " + JSON.stringify(req.session.user));
     console.log("f60, body = " + JSON.stringify(req.body));
     console.log("f60, session = " + JSON.stringify(clientSessions));
-    res.render("userHistory",{user:req.session.user});
+    res.render("userHistory",{user});
     //console.log("f100, user: " + JSON.stringify(user));
 })
 
