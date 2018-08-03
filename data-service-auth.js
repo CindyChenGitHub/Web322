@@ -64,7 +64,7 @@ module.exports.registerUser = function (userData){
                     }
                     else{
                         userData.password = hash;
-                        var newUser = new User(userData);
+                        //var newUser = new User(userData);
                         newUser.save()
                     // .exec()
                         .then(()=>{
@@ -103,16 +103,16 @@ module.exports.checkUser = function (userData){
             console.log("f22, finded_user: " + finded_user);
             console.log("f22, finded_user: " + finded_user[0]);
             //console.log("f22, users[0]: " + users[0]);
-            if (!finded_user){
+/*             if (!finded_user){
                 console.log("f23");
                 reject("Unable to find user: " + userData.userName);
             }
-            else{
+            else{ */
                 bcrypt.compare(userData.password, finded_user[0].password )
                 .then((res) => {
                     // res === true if it matches and res === false if it does not match
-                    if (res){
-                        console.log("f25, user: " + JSON.stringify(finded_user));
+                    //if (res){
+                        console.log("f25, user: " + JSON.stringify(finded_user)+ "/n");
                         console.log("f25, push: " + JSON.stringify({dateTime: (new Date()).toString(), userAgent: userData.userAgent}));
 
                         //console.log("f25 user")
@@ -120,33 +120,37 @@ module.exports.checkUser = function (userData){
                             { $push: { loginHistory: {dateTime: (new Date()).toString(), userAgent: userData.userAgent} } },
                             { multi: false }) */
                         finded_user[0].loginHistory.push({dateTime: (new Date()).toString(), userAgent: userData.userAgent});
-                        console.log("f26, finded_user: " + JSON.stringify(finded_user[0]));
+                        console.log("f26, finded_user: " + JSON.stringify(finded_user[0])+ "/n");
                     //******************************** */
                     // ***************THERE IS PROBLEM HERE************
                     //******************************* */
 
-                        User.update({ userName: finded_user[0].userName}, 
-                                    //{ $set: {password:userData.password}},
+                        User.update({ userName: finded_user[0].userName},   // Note: "finded_user[0]", or there will be a big problem
+                                    //{ $set: {password:finded_user[0].password}},
                                     { $set: { loginHistory: finded_user[0].loginHistory } },
                                     { multi: false })
                         .exec()
-                        .then((users)=>{
+                        .then( ()=>{  // Note: should be nothing inside(), or the finded_user will be mass.
                             //console.log("f27, users: "+ JSON.stringify(users));
                             //console.log("f27, users: "+ JSON.stringify(users));
-                            console.log("f27, userData: "+ JSON.stringify(userData));
-                            console.log("f27, finded_user: "+ JSON.stringify(finded_user[0]));
-                            resolve(users);
+                            console.log("f27, userData: "+ JSON.stringify(userData)+ "/n");
+                            console.log("f27, finded_user: "+ JSON.stringify(finded_user)+ "/n");
+                            resolve(finded_user[0]); //Note: idienty at line 101, other used at line 122. link to server.js->post /login -> .then(get_user) 
                         })
                         .catch((err)=>{
                             reject("There was an error verifying the user: " + err);
                         });
-                    }
+/*                     }
                     else{
-                        console.log("f24");
+                        console.log("f24-1");
                         reject("Incorrect Password for user: " + userData.userName);
-                    }
-                 });                
-            } 
+                    } */
+                })
+                .catch((err)=>{
+                    console.log("f24-2");
+                    reject("Incorrect Password for user: " + userData.userName);
+                })              
+            //} 
         })
         .catch((err)=>{
             console.log("f27, err: " + err);

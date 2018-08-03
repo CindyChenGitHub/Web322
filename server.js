@@ -23,7 +23,6 @@ const multer = require("multer");
 const exphbs = require("express-handlebars");
 const clientSessions = require("client-sessions");
 
-
 app.use(express.static('public'));
 //app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }) );
@@ -35,7 +34,9 @@ app.use(clientSessions({
 }));
 
 app.use(function(req, res, next) {
+    console.log("in use 3");
     res.locals.session = req.session;
+    console.log("in use 3, session: "+ JSON.stringify(req.session));
     next();
 });
 
@@ -124,17 +125,23 @@ app.post("/login", (req, res)=>{
     req.body.userAgent = req.get('User-Agent');
     dataServiceAuth.checkUser(req.body)
     .then((get_user)=>{
-        console.log("f70, user: " + JSON.stringify(get_user));
-        console.log("f70, body: " + JSON.stringify(req.body));
+        console.log("f70");
+        console.log("f70, get_user: " + JSON.stringify(get_user));
+        console.log("f70");
+        //console.log("f70, User.userName: "+ User.userName);
+        console.log("f70");
+        //console.log("f70, User: " + User);
+        console.log("f70, req.body: " + JSON.stringify(req.body));
         console.log("f70, body: " + req.body);
-        console.log("f70, body: " + JSON.stringify(req.body.userName));
+        //console.log("f70, body: " + JSON.stringify(req.body.userName));
         req.session.user = {
             userName: get_user.userName,// authenticated user's userName
+            //password: get_user.password,
             email: get_user.email,// authenticated user's email
             loginHistory: get_user.loginHistory// authenticated user's loginHistory
         };
         console.log("f71");
-        console.log("f71, sessionUser: " + req.session.user);
+        console.log("f71, sessionUser: " + JSON.stringify(req.session.user));
         //console.log("f71, sessionUser: " + JSON.stringify(req.session.user));
         res.redirect('/employees');
         
@@ -143,7 +150,7 @@ app.post("/login", (req, res)=>{
         res.render("login",{errorMessage: err, userName: req.body.userName} );
     });
 
-})
+});
 app.get("/register", (req,res)=>{
     res.render("register");
 });
@@ -165,17 +172,12 @@ app.get("/logout", (req, res)=>{
 })
 app.get("/userHistory", ensureLogin, (req, res)=>{
     
-    user = {
-        userName: req.session.userName,// authenticated user's userName
-        email: req.session.email,// authenticated user's email
-        loginHistory: req.session.loginHistory// authenticated user's loginHistory
-    };
     console.log("f60, user = " + JSON.stringify(req.session.user));
     console.log("f60, body = " + JSON.stringify(req.body));
     console.log("f60, session = " + JSON.stringify(clientSessions));
-    res.render("userHistory",{user});
+    res.render("userHistory",{user: req.session.user});
     //console.log("f100, user: " + JSON.stringify(user));
-})
+});
 
 // Get datas  -----------------------------------------
 // setup a 'route' to get image data
