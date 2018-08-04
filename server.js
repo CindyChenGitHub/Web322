@@ -3,7 +3,7 @@
 *  I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part *  of this assignment has been copied manually or electronically from any other source 
 *  (including 3rd party web sites) or distributed to other students.
 * 
-*  Name: _______Yue Chen_________ Student ID: ___150612166___ Date: ____July 20,2018____
+*  Name: _______Yue Chen_________ Student ID: ___150612166___ Date: ____Aug 3,2018____
 *
 *  Online (Heroku) Link: _____   https://yue-chen-web322-assignment.herokuapp.com/   __________
 *
@@ -15,16 +15,20 @@ const app = express();
 const path = require("path");
 const dataservice = require("./data-service.js");
 const dataServiceAuth = require("./data-service-auth.js");
-
 const fs = require('fs');
 const bodyParser = require("body-parser");
-
 const multer = require("multer");
 const exphbs = require("express-handlebars");
 const clientSessions = require("client-sessions");
-
+const storage = multer.diskStorage({
+    destination: "./public/images/uploaded",
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + path.extname(file.originalname));
+    }
+  });
+// tell multer to use the diskStorage function for naming files instead of the default.
+const upload = multer({ storage: storage });
 app.use(express.static('public'));
-//app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }) );
 app.use(clientSessions({
     cookieName: "session",
@@ -32,27 +36,10 @@ app.use(clientSessions({
     duration: 2*60*1000,
     activeDuration: 60*1000
 }));
-
 app.use(function(req, res, next) {
-    console.log("in use 3");
     res.locals.session = req.session;
-    console.log("in use 3, session: "+ JSON.stringify(req.session));
     next();
 });
-
-function ensureLogin (req, res, next){
-    
-    console.log("f90, in ensureLogin, req.session.user: "+ JSON.stringify(req.session.user));
-    if (!(req.session.user)){
-        res.redirect("/login");
-    }
-    else{
-        next();
-        console.log("f80, after ensureLogin");
-    }
-}
-
-
 app.engine('.hbs', exphbs({ extname:'.hbs', defaultLayout:'main',
     helpers:{
         navLink: function(url, options){
@@ -70,38 +57,26 @@ app.engine('.hbs', exphbs({ extname:'.hbs', defaultLayout:'main',
             }
         }
 }}));
-
 app.set('view engine', '.hbs');
+app.use(function(req,res,next){
+    let route = req.baseUrl + req.path;
+    app.locals.activeRoute = (route == "/") ? "/" : route.replace(/\/$/, "");
+    next();
+});
 
 // call this function after the http server star
 function onHttpStart(){
     console.log("Express http server listening on " + HTTP_PORT);
 };
 
-app.use(function(req,res,next){
-    console.log("f50");
-    let route = req.baseUrl + req.path;
-    app.locals.activeRoute = (route == "/") ? "/" : route.replace(/\/$/, "");
-    console.log("f51 path: ");
-    next();
-    //console.log("f52");
-});
-
-// multer requires a few options to be setup to store files with file extensions
-// by default it won't store extensions for security reasons
-const storage = multer.diskStorage({
-    destination: "./public/images/uploaded",
-    filename: function (req, file, cb) {
-      // we write the filename as the current date down to the millisecond
-      // in a large web service this would possibly cause a problem if two people
-      // uploaded an image at the exact same time. A better way would be to use GUID's for filenames.
-      // this is a simple example.
-      cb(null, Date.now() + path.extname(file.originalname));
+function ensureLogin (req, res, next){
+    if (!(req.session.user)){
+        res.redirect("/login");
     }
-  });
-
-// tell multer to use the diskStorage function for naming files instead of the default.
-const upload = multer({ storage: storage });
+    else{
+        next();
+    }
+}
 
 // GET -----------------------------------------
 // setup a 'route' to home
@@ -125,44 +100,26 @@ app.post("/login", (req, res)=>{
     req.body.userAgent = req.get('User-Agent');
     dataServiceAuth.checkUser(req.body)
     .then((get_user)=>{
-        console.log("f70");
-        console.log("f70, get_user: " + JSON.stringify(get_user));
-        console.log("f70");
-        //console.log("f70, User.userName: "+ User.userName);
-        console.log("f70");
-        //console.log("f70, User: " + User);
-        console.log("f70, req.body: " + JSON.stringify(req.body));
-        console.log("f70, body: " + req.body);
-        //console.log("f70, body: " + JSON.stringify(req.body.userName));
         req.session.user = {
-            userName: get_user.userName,// authenticated user's userName
-            //password: get_user.password,
-            email: get_user.email,// authenticated user's email
-            loginHistory: get_user.loginHistory// authenticated user's loginHistory
+            userName: get_user.userName,
+            email: get_user.email,
+            loginHistory: get_user.loginHistory
         };
-        console.log("f71");
-        console.log("f71, sessionUser: " + JSON.stringify(req.session.user));
-        //console.log("f71, sessionUser: " + JSON.stringify(req.session.user));
-        res.redirect('/employees');
-        
+        res.redirect('/employees');       
     })
     .catch((err)=>{
         res.render("login",{errorMessage: err, userName: req.body.userName} );
     });
-
 });
 app.get("/register", (req,res)=>{
     res.render("register");
 });
 app.post("/register", (req,res)=>{
-    console.log("f0, data= "+ JSON.stringify(req.body));
     dataServiceAuth.registerUser(req.body)
     .then(()=>{
-        console.log("f1, userData: " );
         res.render("register", {successMessage: "User created"});
     })
     .catch((err)=>{
-        console.log("f2, errorCode: " + JSON.stringify(req.body.userName)+err);
         res.render("register",{errorMessage: err, userName: JSON.stringify(req.body.userName)});
     })
 });
@@ -171,18 +128,12 @@ app.get("/logout", (req, res)=>{
     res.redirect("/");
 })
 app.get("/userHistory", ensureLogin, (req, res)=>{
-    
-    console.log("f60, user = " + JSON.stringify(req.session.user));
-    console.log("f60, body = " + JSON.stringify(req.body));
-    console.log("f60, session = " + JSON.stringify(clientSessions));
     res.render("userHistory",{user: req.session.user});
-    //console.log("f100, user: " + JSON.stringify(user));
 });
 
 // Get datas  -----------------------------------------
 // setup a 'route' to get image data
 app.get("/images", ensureLogin, (req,res) =>{
-    //res.render("images", {user: req.session.user});
     fs.readdir("./public/images/uploaded", function(err, data) {
         res.render('images',{images:data}); 
     });
@@ -190,13 +141,13 @@ app.get("/images", ensureLogin, (req,res) =>{
 
 // setup a 'route' to get employees data
 app.get("/employees", ensureLogin, (req,res,Employees)=>{
-    //res.render("employees", {user: req.session.user});
-    console.log("f80, in get employees roude");
     if (req.query.status){
         dataservice.getEmployeesByStatus(req.query.status) 
         .then((data)=>{
-            if (data.length>0)  res.render("employees",{Employees:data});
-            else res.render("employees",{ message: "no results" });
+            if (data.length>0)
+                res.render("employees",{Employees:data});
+            else
+                res.render("employees",{ message: "no results" });
         })
         .catch(()=>{
             res.render("employees",{message: "no results"});
@@ -223,7 +174,6 @@ app.get("/employees", ensureLogin, (req,res,Employees)=>{
         })
     }
     else{
-        console.log("f84, in route get all employees");
         dataservice.getAllEmployees()
         .then((data)=>{
             res.render("employees",{Employees:data});
@@ -236,29 +186,23 @@ app.get("/employees", ensureLogin, (req,res,Employees)=>{
 
 // setup a 'route' to get employees by empNum
 app.get("/employee/:num", ensureLogin, (req,res,data)=>{
-    //res.render("employee", {user: req.session.user});
-    // initialize an empty object to store the values
     let viewData = {};
     var num = req.params.num;
     dataservice.getEmployeeByNum(num)
     .then((data)=>{
         if (data) {
-            viewData.employee = data; //store employee data in the "viewData" object as "employee"
+            viewData.employee = data;
         } 
         else {
-            viewData.employee = null; // set employee to null if none were returned
+            viewData.employee = null;
         }
     })
     .catch(() => {
-        viewData.employee = null; // set employee to null if there was an error 
+        viewData.employee = null;
     })
     .then(dataservice.getDepartments) 
     .then((data) => {
-        viewData.departments = data; // store department data in the "viewData" object as "departments"
-
-        // loop through viewData.departments and once we have found the departmentId that matches
-        // the employee's "department" value, add a "selected" property to the matching 
-        // viewData.departments object
+        viewData.departments = data;
         for (let i = 0; i < viewData.departments.length; i++) {
             if (viewData.departments[i].departmentId == viewData.employee.department) {
                 viewData.departments[i].selected = true;
@@ -266,14 +210,14 @@ app.get("/employee/:num", ensureLogin, (req,res,data)=>{
         }
     })
     .catch(() => {
-        viewData.departments = []; // set departments to empty if there was an error
+        viewData.departments = [];
     })
     .then(() => {
-        if (viewData.employee == null) { // if no employee - return an error
+        if (viewData.employee == null) {
             res.status(404).send("Employee Not Found");
         } 
         else {
-            res.render("employee", { viewData: viewData }); // render the "employee" view
+            res.render("employee", { viewData: viewData });
         }
     })
     .catch(()=>{
@@ -283,7 +227,6 @@ app.get("/employee/:num", ensureLogin, (req,res,data)=>{
 
 // setup a 'route' to get departments data
 app.get("/departments", ensureLogin, (req,res,Departments)=>{
-    //res.render("departments", {user: req.session.user});
     dataservice.getDepartments()
     .then((data)=>{
         if (data.length > 0) res.render("departments", {Departments: data});
@@ -296,7 +239,6 @@ app.get("/departments", ensureLogin, (req,res,Departments)=>{
 
 // setup a 'route' to get departments by Id
 app.get("/department/:num", ensureLogin, (req,res)=>{
-    
     var num = req.params.num;
     dataservice.getDepartmentById(num)
     .then((data)=>{
@@ -310,7 +252,6 @@ app.get("/department/:num", ensureLogin, (req,res)=>{
 // GET CRUD -----------------------------------------
 // setup a get 'route' to display add employee web site
 app.get("/employees/add", ensureLogin, (req,res,Departments)=>{
-    //res.render("employees/add", {user: req.session.user});
     dataservice.getDepartments()
     .then((data)=>{
         res.render("addEmployee", {Departments: data});
