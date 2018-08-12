@@ -49,7 +49,7 @@ module.exports.registerUser = function (userData){
                         reject("There was an error encrypting the password");
                     }
                     else{
-                        userData.password = hash;
+                        newUser.password = hash;
                         newUser.save()
                         .then(()=>{
                             resolve();
