@@ -3,14 +3,14 @@
 *  I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part *  of this assignment has been copied manually or electronically from any other source 
 *  (including 3rd party web sites) or distributed to other students.
 * 
-*  Name: _______Yue Chen_________ Student ID: ___150612166___ Date: ____Aug 3,2018____
+*  Name: _______Cindy_________ Student ID: ___***___ Date: ____Aug 3,2018____
 *
 *  Online (Heroku) Link: _____   https://yue-chen-web322-assignment.herokuapp.com/   __________
 *
 ********************************************************************************/
 
 const Sequelize = require("sequelize");
-var sequelize = new Sequelize ( 'dabtq46lnn68cm', 'wlhvaludlhhecv', '781571', {
+var sequelize = new Sequelize ( 'dabtq46lnn68cm', 'wlhvaludlhhecv', '******', {
     host: 'ec2-23-21-162-90.compute-1.amazonaws.com',
     dialect: 'postgres',
     port: 5432,
