@@ -3,7 +3,7 @@
 *  I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part *  of this assignment has been copied manually or electronically from any other source 
 *  (including 3rd party web sites) or distributed to other students.
 * 
-*  Name: _______Yue Chen_________ Student ID: ___150612166___ Date: ____Aug 3,2018____
+*  Name: _______Cindy_________ Student ID: ___***___ Date: ____Aug 3,2018____
 *
 *  Online (Heroku) Link: _____   https://yue-chen-web322-assignment.herokuapp.com/   __________
 *
